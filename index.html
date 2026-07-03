@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>タロットバトル プロトタイプ</title>
+<style>
+  :root{
+    --wand:#e2543a; --cup:#3a8ee2; --sword:#4aa89c; --pentacle:#c99a3a;
+    --bg:#171523; --panel:#231f36; --panel2:#2c2745; --text:#f1ecff; --sub:#a79cd8;
+    --good:#54d17a; --bad:#e2543a; --accent:#b98af2;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0; overscroll-behavior:none; touch-action:manipulation;}
+  body{
+    background:radial-gradient(circle at 50% 0%, #2a2544 0%, var(--bg) 70%);
+    color:var(--text); font-family:"Hiragino Sans","Yu Gothic",sans-serif;
+    display:flex; justify-content:center;
+  }
+  #app{
+    width:100%; max-width:480px; min-height:100vh;
+    display:flex; flex-direction:column; padding:10px 10px calc(env(safe-area-inset-bottom) + 10px);
+  }
+  header#topbar{display:flex; align-items:center; gap:8px; padding:6px 4px;}
+  .hpbox{flex:1; background:var(--panel); border-radius:10px; padding:8px 10px;}
+  .hpbox .label{font-size:12px; color:var(--sub); margin-bottom:4px;}
+  .hpbar{height:10px; border-radius:6px; background:#151225; overflow:hidden;}
+  .hpfill{height:100%; width:100%; background:linear-gradient(90deg,#54d17a,#8be07a); transition:width .35s ease;}
+  .hpfill.enemy{background:linear-gradient(90deg,#e2543a,#f2926a);}
+  .hpbox .hpnum{font-size:11px; color:var(--sub); margin-top:3px; text-align:right;}
+  .wave{font-size:12px; color:var(--accent); text-align:center; min-width:56px; font-weight:bold;}
+  .attrIcons{font-size:11px; color:var(--sub); margin-top:4px; display:flex; gap:8px;}
+
+  #battleLog{
+    background:var(--panel); border-radius:10px; margin-top:8px; padding:8px 10px;
+    font-size:12px; color:var(--sub); min-height:34px; max-height:54px; overflow-y:auto; line-height:1.5;
+  }
+  #battleLog .new{color:var(--text);}
+
+  #spreadArea{
+    display:flex; gap:6px; justify-content:center; margin:14px 0 6px; padding:8px;
+    background:rgba(0,0,0,.15); border-radius:14px; border:1px dashed #4a4470;
+  }
+  .spreadSlot{
+    width:56px; height:82px; border-radius:8px; background:rgba(255,255,255,.03);
+    border:1px solid #3a3558; display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .spreadSlot .slotIdx{position:absolute; bottom:2px; right:4px; font-size:9px; color:#54507a;}
+
+  #rolePreview{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--panel2); border-radius:10px; padding:8px 12px; margin-bottom:8px;
+    font-size:13px;
+  }
+  #roleName{font-weight:bold; color:var(--accent); font-size:15px;}
+  #roleMult{color:var(--sub); margin-left:6px;}
+  #dmgPreview{font-weight:bold; color:#ffd27a;}
+
+  #controls{display:flex; gap:8px; margin-bottom:10px;}
+  button{
+    border:none; border-radius:10px; padding:12px; font-size:15px; font-weight:bold;
+    cursor:pointer; color:var(--text); -webkit-user-select:none;
+  }
+  #attackBtn{flex:2; background:linear-gradient(180deg,#b98af2,#8a5fd6); box-shadow:0 4px 0 #5c3a9e;}
+  #attackBtn:active{transform:translateY(2px); box-shadow:0 2px 0 #5c3a9e;}
+  #attackBtn:disabled{opacity:.35; box-shadow:none;}
+  #clearBtn{flex:1; background:#3a3558;}
+  #clearBtn:active{transform:translateY(2px);}
+
+  #handArea{
+    display:flex; gap:6px; flex-wrap:wrap; justify-content:center; padding:10px 4px;
+    background:var(--panel); border-radius:14px; flex:1; align-content:flex-start;
+  }
+
+  .card{
+    width:52px; height:78px; border-radius:8px; background:var(--panel2);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border:2px solid transparent; position:relative; transition:transform .15s ease, box-shadow .15s ease, opacity .2s;
+    cursor:pointer;
+  }
+  .card .icon{font-size:18px;}
+  .card .val{font-size:15px; font-weight:bold; margin-top:2px;}
+  .card.wand{border-color:var(--wand); color:var(--wand);}
+  .card.cup{border-color:var(--cup); color:var(--cup);}
+  .card.sword{border-color:var(--sword); color:var(--sword);}
+  .card.pentacle{border-color:var(--pentacle); color:var(--pentacle);}
+  .card.placed{box-shadow:0 0 0 2px rgba(255,255,255,.25);}
+  .card.reversed{transform:rotate(180deg);}
+  .card.reversed.placed{box-shadow:0 0 0 2px var(--accent);}
+  .card .revBadge{
+    position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%;
+    background:var(--accent); color:#1a1730; font-size:11px; display:none;
+    align-items:center; justify-content:center; transform:rotate(180deg);
+  }
+  .card.reversed .revBadge{display:flex;}
+  .card.locked{opacity:.3; cursor:not-allowed;}
+
+  #deckInfo{text-align:center; font-size:11px; color:var(--sub); padding:8px 0 2px;}
+
+  #debugBar{display:flex; gap:6px; justify-content:center; padding-bottom:4px;}
+  #debugBar button{font-size:10px; padding:6px 8px; background:#3a3558; color:var(--sub); font-weight:normal;}
+
+  #overlay{
+    position:fixed; inset:0; background:rgba(10,8,20,.88); display:flex;
+    align-items:center; justify-content:center; z-index:20;
+  }
+  #overlay.hidden{display:none;}
+  #overlayBox{background:var(--panel); border-radius:14px; padding:26px 22px; text-align:center; max-width:320px;}
+  #overlayText{font-size:16px; line-height:1.6; margin-bottom:16px; white-space:pre-line;}
+  #overlayBtn{background:linear-gradient(180deg,#b98af2,#8a5fd6); padding:10px 26px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="hpbox player">
+      <div class="label">あなた</div>
+      <div class="hpbar"><div id="playerHpFill" class="hpfill"></div></div>
+      <div class="hpnum" id="playerHpText">80 / 80</div>
+    </div>
+    <div class="wave" id="waveText">WAVE 1</div>
+    <div class="hpbox enemy">
+      <div class="label" id="enemyName">下級霊</div>
+      <div class="hpbar"><div id="enemyHpFill" class="hpfill enemy"></div></div>
+      <div class="hpnum" id="enemyHpText">40 / 40</div>
+      <div class="attrIcons">弱点<span id="enemyWeak"></span>耐性<span id="enemyResist"></span></div>
+    </div>
+  </header>
+
+  <div id="battleLog"></div>
+
+  <div id="spreadArea"></div>
+
+  <div id="rolePreview">
+    <div><span id="roleName">役なし</span><span id="roleMult">×1.0</span></div>
+    <div id="dmgPreview">予測ダメージ: 0</div>
+  </div>
+
+  <div id="controls">
+    <button id="attackBtn">攻撃！</button>
+    <button id="clearBtn">手札に戻す</button>
+  </div>
+
+  <div id="handArea"></div>
+
+  <div id="deckInfo">山札 <span id="deckCount">48</span> 枚 ／ 逆位置モード: <span id="revStatus">未解放(HP30%以下で解放)</span></div>
+  <div id="debugBar">
+    <button id="debugDamage">テスト:HPを30%にする</button>
+    <button id="debugReset">テスト:最初から</button>
+  </div>
+</div>
+
+<div id="overlay" class="hidden">
+  <div id="overlayBox">
+    <p id="overlayText"></p>
+    <button id="overlayBtn">次へ</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const SUITS = {
+    wand:     { name:'杖',   icon:'🔥', strong:'sword',    weak:'cup' },
+    cup:      { name:'杯',   icon:'💧', strong:'wand',      weak:'pentacle' },
+    sword:    { name:'剣',   icon:'💨', strong:'pentacle',  weak:'wand' },
+    pentacle: { name:'貨幣', icon:'🪙', strong:'cup',       weak:'sword' }
+  };
+  const SUIT_KEYS = Object.keys(SUITS);
+
+  function valueLabel(v){
+    if(v<=10) return String(v);
+    return {11:'P',12:'N',13:'Q',14:'K'}[v];
+  }
+
+  function buildDeck(){
+    const deck = [];
+    SUIT_KEYS.forEach(s=>{
+      for(let v=1; v<=14; v++){
+        deck.push({ id: s+'-'+v, suit:s, value:v, reversed:false });
+      }
+    });
+    return deck;
+  }
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  // ---- role detection ----
+  function maxCount(arr){
+    const m = {};
+    let max = 0;
+    arr.forEach(x=>{ m[x]=(m[x]||0)+1; if(m[x]>max) max=m[x]; });
+    return max;
+  }
+  function longestRun(values){
+    const uniq = [...new Set(values)].sort((a,b)=>a-b);
+    let best=1, cur=1;
+    for(let i=1;i<uniq.length;i++){
+      if(uniq[i]===uniq[i-1]+1){ cur++; best=Math.max(best,cur); }
+      else cur=1;
+    }
+    return uniq.length ? best : 0;
+  }
+  function hasAllCourts(cards){
+    const vals = new Set(cards.map(c=>c.value));
+    return [11,12,13,14].every(v=>vals.has(v)) && cards.length>=4;
+  }
+
+  const ROLE_TABLE = [
+    { key:'grand',    name:'グランドアルカナ', mult:10.0,
+      test: cs => cs.length===5 && new Set(cs.map(c=>c.suit)).size===1 && longestRun(cs.map(c=>c.value))>=5 },
+    { key:'flush',    name:'フラッシュ',       mult:4.0,
+      test: cs => cs.length===5 && new Set(cs.map(c=>c.suit)).size===1 },
+    { key:'court',    name:'コートカード役',   mult:3.5, test: hasAllCourts },
+    { key:'straight', name:'階段',             mult:3.0, test: cs => longestRun(cs.map(c=>c.value))>=3 },
+    { key:'suit3',    name:'同スート3枚',       mult:2.0, test: cs => maxCount(cs.map(c=>c.suit))>=3 },
+    { key:'pair',     name:'ワンペア',          mult:1.5, test: cs => maxCount(cs.map(c=>c.value))>=2 },
+  ];
+
+  function detectRole(cards){
+    if(cards.length===0) return { key:'none', name:'役なし', mult:1.0 };
+    for(const r of ROLE_TABLE){
+      if(r.test(cards)) return r;
+    }
+    return { key:'none', name:'役なし', mult:1.0 };
+  }
+
+  function computeDamage(cards, enemy){
+    if(cards.length===0) return { total:0, role:detectRole(cards), base:0, attrBonus:0, reversedUsed:false };
+    let base=0, attrBonus=0, reversedUsed=false;
+    cards.forEach(c=>{
+      let v = c.value;
+      if(c.reversed){ v = Math.floor(v/2); reversedUsed = true; }
+      base += v;
+      if(c.suit===enemy.weakness) attrBonus += v*0.5;
+      else if(c.suit===enemy.resistance) attrBonus -= v*0.3;
+    });
+    const role = detectRole(cards);
+    let total = (base+attrBonus)*role.mult;
+    if(reversedUsed && role.mult>1.0) total *= 2;
+    total = Math.max(0, Math.round(total));
+    return { total, role, base, attrBonus, reversedUsed };
+  }
+
+  // ---- game state ----
+  const HAND_SIZE = 8;
+  const SPREAD_SIZE = 5;
+
+  let state = null;
+
+  function makeEnemy(wave){
+    const weak = SUIT_KEYS[Math.floor(Math.random()*4)];
+    let resist = SUIT_KEYS[Math.floor(Math.random()*4)];
+    while(resist===weak) resist = SUIT_KEYS[Math.floor(Math.random()*4)];
+    const hp = 30 + wave*18;
+    const names = ['下級霊','彷徨う影','嘆きの亡者','業火の番人','深淵の使者','終焉の影法師'];
+    return {
+      name: names[Math.min(wave-1, names.length-1)],
+      hp, maxHp:hp, weakness:weak, resistance:resist,
+      atkMin: 4+wave, atkMax: 9+wave*2
+    };
+  }
+
+  function newGame(){
+    const deck = shuffle(buildDeck());
+    state = {
+      wave:1,
+      deck,
+      discard:[],
+      hand:[],
+      spread:new Array(SPREAD_SIZE).fill(null),
+      player:{ hp:80, maxHp:80 },
+      enemy: makeEnemy(1),
+      log:[]
+    };
+    drawToHand();
+    pushLog('霊符を構えた。戦いが始まる。');
+    render();
+  }
+
+  function drawToHand(){
+    while(state.hand.length < HAND_SIZE){
+      if(state.deck.length===0){
+        if(state.discard.length===0) break;
+        state.deck = shuffle(state.discard);
+        state.discard = [];
+        pushLog('山札を切り直した。');
+      }
+      state.hand.push(state.deck.pop());
+    }
+  }
+
+  function pushLog(msg){
+    state.log.unshift(msg);
+    state.log = state.log.slice(0,6);
+  }
+
+  function reversedUnlocked(){
+    return state.player.hp <= state.player.maxHp*0.3;
+  }
+
+  function placedCards(){
+    return state.spread.filter(Boolean);
+  }
+
+  function placeCard(id){
+    const idx = state.hand.findIndex(c=>c.id===id);
+    if(idx===-1) return;
+    const slot = state.spread.findIndex(s=>s===null);
+    if(slot===-1) return;
+    const card = state.hand.splice(idx,1)[0];
+    state.spread[slot] = card;
+    render();
+  }
+
+  function unplaceCard(id){
+    const idx = state.spread.findIndex(c=>c && c.id===id);
+    if(idx===-1) return;
+    const card = state.spread[idx];
+    card.reversed = false;
+    state.spread[idx] = null;
+    state.hand.push(card);
+    render();
+  }
+
+  function toggleReverse(id){
+    if(!reversedUnlocked()) return;
+    const card = state.spread.find(c=>c && c.id===id);
+    if(!card) return;
+    card.reversed = !card.reversed;
+    render();
+  }
+
+  function clearSpread(){
+    state.spread.forEach((c,i)=>{
+      if(c){ c.reversed=false; state.hand.push(c); state.spread[i]=null; }
+    });
+    render();
+  }
+
+  function doAttack(){
+    const cards = placedCards();
+    if(cards.length===0) return;
+    const result = computeDamage(cards, state.enemy);
+    state.enemy.hp = Math.max(0, state.enemy.hp - result.total);
+    pushLog(`${result.role.name}(×${result.role.mult.toFixed(1)}) で ${result.total} ダメージ！`);
+
+    // discard used cards
+    state.spread.forEach((c,i)=>{
+      if(c){ c.reversed=false; state.discard.push(c); state.spread[i]=null; }
+    });
+
+    if(state.enemy.hp<=0){
+      render();
+      showOverlay(`${state.enemy.name}を倒した！\n次のWAVEへ進む。`, ()=>{
+        state.wave++;
+        state.enemy = makeEnemy(state.wave);
+        drawToHand();
+        render();
+      });
+      return;
+    }
+
+    // enemy counter
+    const dmg = Math.floor(Math.random()*(state.enemy.atkMax-state.enemy.atkMin+1))+state.enemy.atkMin;
+    state.player.hp = Math.max(0, state.player.hp - dmg);
+    pushLog(`${state.enemy.name}の反撃、${dmg} ダメージを受けた。`);
+
+    drawToHand();
+
+    if(state.player.hp<=0){
+      render();
+      showOverlay(`力尽きた…\nWAVE ${state.wave} で敗北。`, ()=>{ newGame(); });
+      return;
+    }
+
+    render();
+  }
+
+  function showOverlay(text, onNext){
+    const ov = document.getElementById('overlay');
+    document.getElementById('overlayText').textContent = text;
+    ov.classList.remove('hidden');
+    const btn = document.getElementById('overlayBtn');
+    btn.onclick = ()=>{ ov.classList.add('hidden'); onNext(); };
+  }
+
+  // ---- rendering ----
+  function cardEl(card, placed){
+    const el = document.createElement('div');
+    el.className = 'card ' + card.suit + (placed?' placed':'') + (card.reversed?' reversed':'');
+    el.innerHTML = `
+      <div class="icon">${SUITS[card.suit].icon}</div>
+      <div class="val">${valueLabel(card.value)}</div>
+      <div class="revBadge">⇅</div>
+    `;
+    el.addEventListener('click', ()=>{
+      if(placed){
+        toggleReverse(card.id);
+      } else {
+        placeCard(card.id);
+      }
+    });
+    if(placed){
+      el.addEventListener('dblclick', ()=> unplaceCard(card.id));
+      let pressTimer;
+      el.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(()=> unplaceCard(card.id), 480);
+      }, {passive:true});
+      el.addEventListener('touchend', ()=> clearTimeout(pressTimer));
+    }
+    return el;
+  }
+
+  function render(){
+    // hp bars
+    const p = state.player, e = state.enemy;
+    document.getElementById('playerHpFill').style.width = Math.max(0,100*p.hp/p.maxHp)+'%';
+    document.getElementById('playerHpText').textContent = `${p.hp} / ${p.maxHp}`;
+    document.getElementById('enemyHpFill').style.width = Math.max(0,100*e.hp/e.maxHp)+'%';
+    document.getElementById('enemyHpText').textContent = `${e.hp} / ${e.maxHp}`;
+    document.getElementById('enemyName').textContent = e.name;
+    document.getElementById('enemyWeak').textContent = SUITS[e.weakness].icon;
+    document.getElementById('enemyResist').textContent = SUITS[e.resistance].icon;
+    document.getElementById('waveText').textContent = 'WAVE ' + state.wave;
+
+    // log
+    const logEl = document.getElementById('battleLog');
+    logEl.innerHTML = state.log.map((m,i)=>`<div class="${i===0?'new':''}">${m}</div>`).join('');
+
+    // spread
+    const spreadEl = document.getElementById('spreadArea');
+    spreadEl.innerHTML = '';
+    state.spread.forEach((c,i)=>{
+      const slot = document.createElement('div');
+      slot.className = 'spreadSlot';
+      if(c){
+        slot.appendChild(cardEl(c, true));
+      } else {
+        const idx = document.createElement('div');
+        idx.className='slotIdx';
+        idx.textContent = i+1;
+        slot.appendChild(idx);
+      }
+      spreadEl.appendChild(slot);
+    });
+
+    // role preview
+    const cards = placedCards();
+    const result = computeDamage(cards, state.enemy);
+    document.getElementById('roleName').textContent = result.role.name;
+    document.getElementById('roleMult').textContent = '×'+result.role.mult.toFixed(1);
+    document.getElementById('dmgPreview').textContent = '予測ダメージ: ' + result.total;
+    document.getElementById('attackBtn').disabled = cards.length===0;
+
+    // hand
+    const handEl = document.getElementById('handArea');
+    handEl.innerHTML = '';
+    state.hand.forEach(c=> handEl.appendChild(cardEl(c, false)));
+
+    // deck / reversed status
+    document.getElementById('deckCount').textContent = state.deck.length;
+    document.getElementById('revStatus').textContent = reversedUnlocked() ? '解放中(カードをタップで反転)' : '未解放(HP30%以下で解放)';
+  }
+
+  // ---- controls ----
+  document.getElementById('attackBtn').addEventListener('click', doAttack);
+  document.getElementById('clearBtn').addEventListener('click', clearSpread);
+  document.getElementById('debugDamage').addEventListener('click', ()=>{
+    state.player.hp = Math.max(1, Math.floor(state.player.maxHp*0.25));
+    pushLog('【テスト】HPを25%に設定した。逆位置モード解放。');
+    render();
+  });
+  document.getElementById('debugReset').addEventListener('click', newGame);
+
+  newGame();
+})();
+</script>
+</body>
+</html>
