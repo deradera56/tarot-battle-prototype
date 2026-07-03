@@ -21,15 +21,33 @@
     width:100%; max-width:480px; min-height:100vh;
     display:flex; flex-direction:column; padding:10px 10px calc(env(safe-area-inset-bottom) + 10px);
   }
-  header#topbar{display:flex; align-items:center; gap:8px; padding:6px 4px;}
+
+  header#topbar{display:flex; align-items:center; gap:6px; padding:2px 4px 8px;}
+  header#topbar .title{flex:1; font-size:14px; font-weight:bold; color:var(--accent); letter-spacing:.05em;}
+  .iconBtn{
+    width:32px; height:32px; border-radius:50%; background:var(--panel2); color:var(--sub);
+    display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:bold;
+    border:1px solid #45406a; padding:0;
+  }
+  .iconBtn:active{transform:scale(.92);}
+
+  #statusRow{display:flex; align-items:stretch; gap:8px;}
   .hpbox{flex:1; background:var(--panel); border-radius:10px; padding:8px 10px;}
-  .hpbox .label{font-size:12px; color:var(--sub); margin-bottom:4px;}
+  .hpbox .label{font-size:12px; color:var(--sub); margin-bottom:4px; display:flex; align-items:center; gap:5px;}
   .hpbar{height:10px; border-radius:6px; background:#151225; overflow:hidden;}
   .hpfill{height:100%; width:100%; background:linear-gradient(90deg,#54d17a,#8be07a); transition:width .35s ease;}
   .hpfill.enemy{background:linear-gradient(90deg,#e2543a,#f2926a);}
   .hpbox .hpnum{font-size:11px; color:var(--sub); margin-top:3px; text-align:right;}
-  .wave{font-size:12px; color:var(--accent); text-align:center; min-width:56px; font-weight:bold;}
-  .attrIcons{font-size:11px; color:var(--sub); margin-top:4px; display:flex; gap:8px;}
+  .wave{font-size:11px; color:var(--accent); text-align:center; min-width:44px; font-weight:bold; align-self:center;}
+  .attrIcons{font-size:11px; color:var(--sub); margin-top:4px; display:flex; gap:8px; align-items:center;}
+  .attrIcons .aicon{width:16px; height:16px; vertical-align:middle;}
+
+  #enemyStage{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--panel); border-radius:10px; padding:8px; margin-top:8px;
+  }
+  #enemyArt{width:64px; height:64px; flex-shrink:0; filter:drop-shadow(0 0 10px rgba(180,140,255,.35));}
+  #enemyStage .enemyInfo{flex:1;}
 
   #battleLog{
     background:var(--panel); border-radius:10px; margin-top:8px; padding:8px 10px;
@@ -42,7 +60,7 @@
     background:rgba(0,0,0,.15); border-radius:14px; border:1px dashed #4a4470;
   }
   .spreadSlot{
-    width:56px; height:82px; border-radius:8px; background:rgba(255,255,255,.03);
+    width:58px; height:86px; border-radius:8px; background:rgba(255,255,255,.03);
     border:1px solid #3a3558; display:flex; align-items:center; justify-content:center;
     position:relative;
   }
@@ -60,7 +78,7 @@
   #controls{display:flex; gap:8px; margin-bottom:10px;}
   button{
     border:none; border-radius:10px; padding:12px; font-size:15px; font-weight:bold;
-    cursor:pointer; color:var(--text); -webkit-user-select:none;
+    cursor:pointer; color:var(--text); -webkit-user-select:none; font-family:inherit;
   }
   #attackBtn{flex:2; background:linear-gradient(180deg,#b98af2,#8a5fd6); box-shadow:0 4px 0 #5c3a9e;}
   #attackBtn:active{transform:translateY(2px); box-shadow:0 2px 0 #5c3a9e;}
@@ -74,17 +92,18 @@
   }
 
   .card{
-    width:52px; height:78px; border-radius:8px; background:var(--panel2);
+    width:56px; height:84px; border-radius:9px; position:relative; cursor:pointer;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    border:2px solid transparent; position:relative; transition:transform .15s ease, box-shadow .15s ease, opacity .2s;
-    cursor:pointer;
+    border:2px solid transparent; transition:transform .15s ease, box-shadow .15s ease, opacity .2s;
+    background:radial-gradient(circle at 50% 20%, var(--cardglow) 0%, var(--panel2) 72%);
   }
-  .card .icon{font-size:18px;}
-  .card .val{font-size:15px; font-weight:bold; margin-top:2px;}
-  .card.wand{border-color:var(--wand); color:var(--wand);}
-  .card.cup{border-color:var(--cup); color:var(--cup);}
-  .card.sword{border-color:var(--sword); color:var(--sword);}
-  .card.pentacle{border-color:var(--pentacle); color:var(--pentacle);}
+  .card .cicon{width:26px; height:26px; color:var(--suitcolor);}
+  .card .val{font-size:14px; font-weight:bold; margin-top:2px; color:var(--text);}
+  .card .sname{font-size:8px; color:var(--sub); margin-top:1px;}
+  .card.wand{--suitcolor:var(--wand); --cardglow:rgba(226,84,58,.22); border-color:var(--wand);}
+  .card.cup{--suitcolor:var(--cup); --cardglow:rgba(58,142,226,.22); border-color:var(--cup);}
+  .card.sword{--suitcolor:var(--sword); --cardglow:rgba(74,168,156,.22); border-color:var(--sword);}
+  .card.pentacle{--suitcolor:var(--pentacle); --cardglow:rgba(201,154,58,.22); border-color:var(--pentacle);}
   .card.placed{box-shadow:0 0 0 2px rgba(255,255,255,.25);}
   .card.reversed{transform:rotate(180deg);}
   .card.reversed.placed{box-shadow:0 0 0 2px var(--accent);}
@@ -94,7 +113,6 @@
     align-items:center; justify-content:center; transform:rotate(180deg);
   }
   .card.reversed .revBadge{display:flex;}
-  .card.locked{opacity:.3; cursor:not-allowed;}
 
   #deckInfo{text-align:center; font-size:11px; color:var(--sub); padding:8px 0 2px;}
 
@@ -109,11 +127,40 @@
   #overlayBox{background:var(--panel); border-radius:14px; padding:26px 22px; text-align:center; max-width:320px;}
   #overlayText{font-size:16px; line-height:1.6; margin-bottom:16px; white-space:pre-line;}
   #overlayBtn{background:linear-gradient(180deg,#b98af2,#8a5fd6); padding:10px 26px;}
+
+  .modalBg{
+    position:fixed; inset:0; background:rgba(10,8,20,.85); display:flex; align-items:flex-end;
+    justify-content:center; z-index:30;
+  }
+  .modalBg.hidden{display:none;}
+  .modalSheet{
+    width:100%; max-width:480px; max-height:82vh; overflow-y:auto; background:var(--panel);
+    border-radius:18px 18px 0 0; padding:18px 18px calc(env(safe-area-inset-bottom) + 18px);
+  }
+  .modalSheet h2{margin:0 0 12px; font-size:17px; color:var(--accent);}
+  .modalSheet .closeRow{display:flex; justify-content:flex-end; margin-top:14px;}
+  .modalSheet .closeBtn{background:var(--panel2); padding:8px 22px; font-weight:normal; font-size:13px;}
+  .helpBlock{font-size:13px; line-height:1.8; color:var(--text); margin-bottom:10px;}
+  .helpBlock b{color:var(--accent);}
+  .roleTable{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .roleTable th{text-align:left; color:var(--sub); font-weight:normal; padding:6px 4px; border-bottom:1px solid #3a3558;}
+  .roleTable td{padding:7px 4px; border-bottom:1px solid #2c2745;}
+  .roleTable td.mult{color:#ffd27a; font-weight:bold; text-align:right;}
+  .roleTable td.name{color:var(--text); font-weight:bold;}
+  .attrLegend{display:flex; flex-wrap:wrap; gap:10px; font-size:12px; color:var(--sub); margin-top:10px;}
+  .attrLegend .ai{display:flex; align-items:center; gap:4px;}
+  .attrLegend svg{width:16px; height:16px;}
 </style>
 </head>
 <body>
 <div id="app">
   <header id="topbar">
+    <div class="title">タロットバトル</div>
+    <button class="iconBtn" id="helpBtn" title="説明">?</button>
+    <button class="iconBtn" id="roleListBtn" title="役一覧">役</button>
+  </header>
+
+  <div id="statusRow">
     <div class="hpbox player">
       <div class="label">あなた</div>
       <div class="hpbar"><div id="playerHpFill" class="hpfill"></div></div>
@@ -124,9 +171,18 @@
       <div class="label" id="enemyName">下級霊</div>
       <div class="hpbar"><div id="enemyHpFill" class="hpfill enemy"></div></div>
       <div class="hpnum" id="enemyHpText">40 / 40</div>
-      <div class="attrIcons">弱点<span id="enemyWeak"></span>耐性<span id="enemyResist"></span></div>
     </div>
-  </header>
+  </div>
+
+  <div id="enemyStage">
+    <div id="enemyArt"></div>
+    <div class="enemyInfo">
+      <div class="attrIcons">
+        弱点 <span id="enemyWeak"></span>
+        耐性 <span id="enemyResist"></span>
+      </div>
+    </div>
+  </div>
 
   <div id="battleLog"></div>
 
@@ -158,26 +214,103 @@
   </div>
 </div>
 
+<div id="helpModal" class="modalBg hidden">
+  <div class="modalSheet">
+    <h2>遊び方</h2>
+    <div class="helpBlock">
+      <b>目的：</b>手札のタロットカードを組み合わせて「役」を作り、敵にダメージを与えて撃破する。
+    </div>
+    <div class="helpBlock">
+      <b>①配置：</b>下の手札をタップすると、上のスプレッド（5マス）に置かれる。<br>
+      <b>②戻す：</b>スプレッドのカードを長押し（またはダブルクリック）すると手札に戻る。
+    </div>
+    <div class="helpBlock">
+      <b>③役とダメージ：</b>配置したカードの組み合わせで役が自動判定され、乗率が高いほど大ダメージ。詳しくは「役」ボタンを確認。
+    </div>
+    <div class="helpBlock">
+      <b>④属性相性：</b>敵には弱点・耐性の属性がある。弱点属性のカードを使うとダメージ+50%、耐性属性は-30%。
+      <div class="attrLegend" id="attrLegendHelp"></div>
+    </div>
+    <div class="helpBlock">
+      <b>⑤逆位置：</b>HPが30%以下になると、配置済みカードをタップして逆位置にできる。基礎値は半減するが、役が成立すればダメージが2倍になる一発逆転の切り札。
+    </div>
+    <div class="helpBlock">
+      <b>⑥攻撃：</b>「攻撃！」で確定すると敵にダメージ、その後敵の反撃を受けてターン終了。敵を倒すと次のWAVEへ。
+    </div>
+    <div class="closeRow"><button class="closeBtn" id="closeHelp">閉じる</button></div>
+  </div>
+</div>
+
+<div id="roleModal" class="modalBg hidden">
+  <div class="modalSheet">
+    <h2>役一覧</h2>
+    <table class="roleTable">
+      <tr><th>役名</th><th>条件</th><th>乗率</th></tr>
+      <tr><td class="name">ワンペア</td><td>同じ数字が2枚</td><td class="mult">×1.5</td></tr>
+      <tr><td class="name">同スート3枚</td><td>同じスートが3枚以上</td><td class="mult">×2.0</td></tr>
+      <tr><td class="name">階段</td><td>数字が3つ以上連続</td><td class="mult">×3.0</td></tr>
+      <tr><td class="name">コートカード役</td><td>P・N・Q・K が揃う</td><td class="mult">×3.5</td></tr>
+      <tr><td class="name">フラッシュ</td><td>5枚とも同じスート</td><td class="mult">×4.0</td></tr>
+      <tr><td class="name">グランドアルカナ</td><td>同スート5枚＋数字連続</td><td class="mult">×10.0</td></tr>
+    </table>
+    <div class="helpBlock" style="margin-top:12px;">
+      ダメージ ＝ (カード基礎値の合計 ＋ 属性ボーナス) × 役の乗率 ×（逆位置成立時は2倍）
+    </div>
+    <div class="closeRow"><button class="closeBtn" id="closeRoleList">閉じる</button></div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
 
   const SUITS = {
-    wand:     { name:'杖',   icon:'🔥', strong:'sword',    weak:'cup' },
-    cup:      { name:'杯',   icon:'💧', strong:'wand',      weak:'pentacle' },
-    sword:    { name:'剣',   icon:'💨', strong:'pentacle',  weak:'wand' },
-    pentacle: { name:'貨幣', icon:'🪙', strong:'cup',       weak:'sword' }
+    wand:     { name:'杖',   strong:'sword',    weak:'cup' },
+    cup:      { name:'杯',   strong:'wand',      weak:'pentacle' },
+    sword:    { name:'剣',   strong:'pentacle',  weak:'wand' },
+    pentacle: { name:'貨幣', strong:'cup',       weak:'sword' }
   };
   const SUIT_KEYS = Object.keys(SUITS);
+
+  function suitIconSVG(suit){
+    const paths = {
+      wand: '<line x1="20" y1="14" x2="20" y2="35" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path d="M20 3 C25 8 25 13 20 18 C15 13 15 8 20 3 Z" fill="currentColor"/>',
+      cup: '<path d="M11 6 H29 C29 17 24 21 20 21 C16 21 11 17 11 6 Z" fill="currentColor"/><rect x="18" y="21" width="4" height="9" fill="currentColor"/><path d="M11 33 H29 L26.5 37 H13.5 Z" fill="currentColor"/>',
+      sword: '<rect x="18.3" y="3" width="3.4" height="23" fill="currentColor"/><path d="M20 1 L23.5 8 H16.5 Z" fill="currentColor"/><rect x="11" y="26" width="18" height="3.2" rx="1.4" fill="currentColor"/><rect x="18.3" y="29.5" width="3.4" height="7" fill="currentColor"/><path d="M16 37 H24 L22 40 H18 Z" fill="currentColor"/>',
+      pentacle: '<circle cx="20" cy="20" r="16.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M20 7 L23.8 16.6 L34 16.6 L25.7 22.7 L28.9 32.8 L20 26.4 L11.1 32.8 L14.3 22.7 L6 16.6 L16.2 16.6 Z" fill="currentColor"/>'
+    };
+    return '<svg viewBox="0 0 40 40" class="cicon">' + paths[suit] + '</svg>';
+  }
+  function courtFigureSVG(suit){
+    return '<svg viewBox="0 0 40 40" class="cicon"><circle cx="20" cy="10" r="6.2" fill="currentColor"/><path d="M7 35 C7 22 13 18 20 18 C27 18 33 22 33 35 Z" fill="currentColor"/><path d="M20 3 L23 9 L20 7 L17 9 Z" fill="currentColor" opacity=".85"/></svg>';
+  }
+
+  const ENEMY_ART = {
+    ghost: '<svg viewBox="0 0 120 120"><defs><radialGradient id="g1" cx="50%" cy="35%" r="65%"><stop offset="0%" stop-color="#cfe8ff"/><stop offset="100%" stop-color="#7fb3e0"/></radialGradient></defs><path d="M25 62 C25 30 40 14 60 14 C80 14 95 30 95 62 L95 96 L85 89 L75 99 L65 89 L55 99 L45 89 L35 99 L25 96 Z" fill="url(#g1)"/><circle cx="48" cy="56" r="5" fill="#1a1730"/><circle cx="72" cy="56" r="5" fill="#1a1730"/></svg>',
+    shadow: '<svg viewBox="0 0 120 120"><defs><radialGradient id="g2" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#9a80d4"/><stop offset="100%" stop-color="#3a2f5c"/></radialGradient></defs><ellipse cx="60" cy="30" rx="14" ry="16" fill="url(#g2)"/><path d="M30 102 C25 60 35 45 60 45 C85 45 95 60 90 102 C80 93 75 106 65 97 C60 107 55 93 50 101 C45 109 38 93 30 102 Z" fill="url(#g2)"/><circle cx="53" cy="30" r="3" fill="#ffd27a"/><circle cx="67" cy="30" r="3" fill="#ffd27a"/></svg>',
+    wraith: '<svg viewBox="0 0 120 120"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a9bce4"/><stop offset="100%" stop-color="#465179"/></linearGradient></defs><path d="M60 14 C48 14 44 27 44 27 C30 39 25 70 30 101 L90 101 C95 70 90 39 76 27 C76 27 72 14 60 14 Z" fill="url(#g3)"/><circle cx="50" cy="46" r="3.6" fill="#1a1730"/><circle cx="70" cy="46" r="3.6" fill="#1a1730"/><path d="M50 51 L47 62" stroke="#8fd0ff" stroke-width="2.6" stroke-linecap="round"/><path d="M70 51 L73 62" stroke="#8fd0ff" stroke-width="2.6" stroke-linecap="round"/></svg>',
+    flame: '<svg viewBox="0 0 120 120"><defs><radialGradient id="g4" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#ffd27a"/><stop offset="60%" stop-color="#e2543a"/><stop offset="100%" stop-color="#7a2418"/></radialGradient></defs><path d="M40 30 L29 4 L49 20 Z" fill="url(#g4)"/><path d="M80 30 L91 4 L71 20 Z" fill="url(#g4)"/><path d="M34 101 C24 70 30 34 60 34 C90 34 96 70 86 101 Z" fill="url(#g4)"/><circle cx="50" cy="56" r="4.2" fill="#1a0f08"/><circle cx="70" cy="56" r="4.2" fill="#1a0f08"/></svg>',
+    abyss: '<svg viewBox="0 0 120 120"><defs><radialGradient id="g5" cx="50%" cy="35%" r="65%"><stop offset="0%" stop-color="#7a5cc0"/><stop offset="100%" stop-color="#1c1430"/></radialGradient></defs><path d="M8 55 C25 38 36 44 43 60 L19 71 Z" fill="url(#g5)" opacity=".9"/><path d="M112 55 C95 38 84 44 77 60 L101 71 Z" fill="url(#g5)" opacity=".9"/><path d="M36 101 C30 68 37 28 60 28 C83 28 90 68 84 101 Z" fill="url(#g5)"/><circle cx="52" cy="53" r="4.2" fill="#ff6a6a"/><circle cx="68" cy="53" r="4.2" fill="#ff6a6a"/></svg>',
+    end: '<svg viewBox="0 0 120 120"><defs><radialGradient id="g6" cx="50%" cy="30%" r="75%"><stop offset="0%" stop-color="#5a2a63"/><stop offset="100%" stop-color="#0d0812"/></radialGradient></defs><path d="M18 106 C8 58 25 13 60 13 C95 13 112 58 102 106 C90 95 85 109 75 98 C68 111 60 96 52 109 C44 96 38 111 30 98 C20 109 18 106 18 106 Z" fill="url(#g6)"/><circle cx="45" cy="50" r="3.8" fill="#ff3b3b"/><circle cx="60" cy="55" r="3.8" fill="#ff3b3b"/><circle cx="75" cy="50" r="3.8" fill="#ff3b3b"/></svg>'
+  };
+  const ENEMY_DEFS = [
+    { name:'下級霊',       art:'ghost'  },
+    { name:'彷徨う影',     art:'shadow' },
+    { name:'嘆きの亡者',   art:'wraith' },
+    { name:'業火の番人',   art:'flame'  },
+    { name:'深淵の使者',   art:'abyss'  },
+    { name:'終焉の影法師', art:'end'    }
+  ];
 
   function valueLabel(v){
     if(v<=10) return String(v);
     return {11:'P',12:'N',13:'Q',14:'K'}[v];
   }
+  function isCourt(v){ return v>=11; }
 
   function buildDeck(){
     const deck = [];
-    SUIT_KEYS.forEach(s=>{
+    SUIT_KEYS.forEach(function(s){
       for(let v=1; v<=14; v++){
         deck.push({ id: s+'-'+v, suit:s, value:v, reversed:false });
       }
@@ -188,20 +321,19 @@
   function shuffle(arr){
     for(let i=arr.length-1;i>0;i--){
       const j = Math.floor(Math.random()*(i+1));
-      [arr[i],arr[j]] = [arr[j],arr[i]];
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
     }
     return arr;
   }
 
-  // ---- role detection ----
   function maxCount(arr){
     const m = {};
     let max = 0;
-    arr.forEach(x=>{ m[x]=(m[x]||0)+1; if(m[x]>max) max=m[x]; });
+    arr.forEach(function(x){ m[x]=(m[x]||0)+1; if(m[x]>max) max=m[x]; });
     return max;
   }
   function longestRun(values){
-    const uniq = [...new Set(values)].sort((a,b)=>a-b);
+    const uniq = Array.from(new Set(values)).sort(function(a,b){ return a-b; });
     let best=1, cur=1;
     for(let i=1;i<uniq.length;i++){
       if(uniq[i]===uniq[i-1]+1){ cur++; best=Math.max(best,cur); }
@@ -210,24 +342,25 @@
     return uniq.length ? best : 0;
   }
   function hasAllCourts(cards){
-    const vals = new Set(cards.map(c=>c.value));
-    return [11,12,13,14].every(v=>vals.has(v)) && cards.length>=4;
+    const vals = new Set(cards.map(function(c){ return c.value; }));
+    return [11,12,13,14].every(function(v){ return vals.has(v); }) && cards.length>=4;
   }
 
   const ROLE_TABLE = [
     { key:'grand',    name:'グランドアルカナ', mult:10.0,
-      test: cs => cs.length===5 && new Set(cs.map(c=>c.suit)).size===1 && longestRun(cs.map(c=>c.value))>=5 },
+      test: function(cs){ return cs.length===5 && new Set(cs.map(function(c){return c.suit;})).size===1 && longestRun(cs.map(function(c){return c.value;}))>=5; } },
     { key:'flush',    name:'フラッシュ',       mult:4.0,
-      test: cs => cs.length===5 && new Set(cs.map(c=>c.suit)).size===1 },
+      test: function(cs){ return cs.length===5 && new Set(cs.map(function(c){return c.suit;})).size===1; } },
     { key:'court',    name:'コートカード役',   mult:3.5, test: hasAllCourts },
-    { key:'straight', name:'階段',             mult:3.0, test: cs => longestRun(cs.map(c=>c.value))>=3 },
-    { key:'suit3',    name:'同スート3枚',       mult:2.0, test: cs => maxCount(cs.map(c=>c.suit))>=3 },
-    { key:'pair',     name:'ワンペア',          mult:1.5, test: cs => maxCount(cs.map(c=>c.value))>=2 },
+    { key:'straight', name:'階段',             mult:3.0, test: function(cs){ return longestRun(cs.map(function(c){return c.value;}))>=3; } },
+    { key:'suit3',    name:'同スート3枚',       mult:2.0, test: function(cs){ return maxCount(cs.map(function(c){return c.suit;}))>=3; } },
+    { key:'pair',     name:'ワンペア',          mult:1.5, test: function(cs){ return maxCount(cs.map(function(c){return c.value;}))>=2; } },
   ];
 
   function detectRole(cards){
     if(cards.length===0) return { key:'none', name:'役なし', mult:1.0 };
-    for(const r of ROLE_TABLE){
+    for(let i=0;i<ROLE_TABLE.length;i++){
+      const r = ROLE_TABLE[i];
       if(r.test(cards)) return r;
     }
     return { key:'none', name:'役なし', mult:1.0 };
@@ -236,7 +369,7 @@
   function computeDamage(cards, enemy){
     if(cards.length===0) return { total:0, role:detectRole(cards), base:0, attrBonus:0, reversedUsed:false };
     let base=0, attrBonus=0, reversedUsed=false;
-    cards.forEach(c=>{
+    cards.forEach(function(c){
       let v = c.value;
       if(c.reversed){ v = Math.floor(v/2); reversedUsed = true; }
       base += v;
@@ -247,10 +380,9 @@
     let total = (base+attrBonus)*role.mult;
     if(reversedUsed && role.mult>1.0) total *= 2;
     total = Math.max(0, Math.round(total));
-    return { total, role, base, attrBonus, reversedUsed };
+    return { total: total, role: role, base: base, attrBonus: attrBonus, reversedUsed: reversedUsed };
   }
 
-  // ---- game state ----
   const HAND_SIZE = 8;
   const SPREAD_SIZE = 5;
 
@@ -261,10 +393,10 @@
     let resist = SUIT_KEYS[Math.floor(Math.random()*4)];
     while(resist===weak) resist = SUIT_KEYS[Math.floor(Math.random()*4)];
     const hp = 30 + wave*18;
-    const names = ['下級霊','彷徨う影','嘆きの亡者','業火の番人','深淵の使者','終焉の影法師'];
+    const def = ENEMY_DEFS[Math.min(wave-1, ENEMY_DEFS.length-1)];
     return {
-      name: names[Math.min(wave-1, names.length-1)],
-      hp, maxHp:hp, weakness:weak, resistance:resist,
+      name: def.name, art: def.art,
+      hp: hp, maxHp: hp, weakness: weak, resistance: resist,
       atkMin: 4+wave, atkMax: 9+wave*2
     };
   }
@@ -272,14 +404,14 @@
   function newGame(){
     const deck = shuffle(buildDeck());
     state = {
-      wave:1,
-      deck,
-      discard:[],
-      hand:[],
-      spread:new Array(SPREAD_SIZE).fill(null),
-      player:{ hp:80, maxHp:80 },
+      wave: 1,
+      deck: deck,
+      discard: [],
+      hand: [],
+      spread: new Array(SPREAD_SIZE).fill(null),
+      player: { hp:80, maxHp:80 },
       enemy: makeEnemy(1),
-      log:[]
+      log: []
     };
     drawToHand();
     pushLog('霊符を構えた。戦いが始まる。');
@@ -312,9 +444,9 @@
   }
 
   function placeCard(id){
-    const idx = state.hand.findIndex(c=>c.id===id);
+    const idx = state.hand.findIndex(function(c){ return c.id===id; });
     if(idx===-1) return;
-    const slot = state.spread.findIndex(s=>s===null);
+    const slot = state.spread.findIndex(function(s){ return s===null; });
     if(slot===-1) return;
     const card = state.hand.splice(idx,1)[0];
     state.spread[slot] = card;
@@ -322,7 +454,7 @@
   }
 
   function unplaceCard(id){
-    const idx = state.spread.findIndex(c=>c && c.id===id);
+    const idx = state.spread.findIndex(function(c){ return c && c.id===id; });
     if(idx===-1) return;
     const card = state.spread[idx];
     card.reversed = false;
@@ -333,14 +465,14 @@
 
   function toggleReverse(id){
     if(!reversedUnlocked()) return;
-    const card = state.spread.find(c=>c && c.id===id);
+    const card = state.spread.find(function(c){ return c && c.id===id; });
     if(!card) return;
     card.reversed = !card.reversed;
     render();
   }
 
   function clearSpread(){
-    state.spread.forEach((c,i)=>{
+    state.spread.forEach(function(c,i){
       if(c){ c.reversed=false; state.hand.push(c); state.spread[i]=null; }
     });
     render();
@@ -351,16 +483,15 @@
     if(cards.length===0) return;
     const result = computeDamage(cards, state.enemy);
     state.enemy.hp = Math.max(0, state.enemy.hp - result.total);
-    pushLog(`${result.role.name}(×${result.role.mult.toFixed(1)}) で ${result.total} ダメージ！`);
+    pushLog(result.role.name + '(×' + result.role.mult.toFixed(1) + ') で ' + result.total + ' ダメージ！');
 
-    // discard used cards
-    state.spread.forEach((c,i)=>{
+    state.spread.forEach(function(c,i){
       if(c){ c.reversed=false; state.discard.push(c); state.spread[i]=null; }
     });
 
     if(state.enemy.hp<=0){
       render();
-      showOverlay(`${state.enemy.name}を倒した！\n次のWAVEへ進む。`, ()=>{
+      showOverlay(state.enemy.name + 'を倒した！\n次のWAVEへ進む。', function(){
         state.wave++;
         state.enemy = makeEnemy(state.wave);
         drawToHand();
@@ -369,16 +500,15 @@
       return;
     }
 
-    // enemy counter
     const dmg = Math.floor(Math.random()*(state.enemy.atkMax-state.enemy.atkMin+1))+state.enemy.atkMin;
     state.player.hp = Math.max(0, state.player.hp - dmg);
-    pushLog(`${state.enemy.name}の反撃、${dmg} ダメージを受けた。`);
+    pushLog(state.enemy.name + 'の反撃、' + dmg + ' ダメージを受けた。');
 
     drawToHand();
 
     if(state.player.hp<=0){
       render();
-      showOverlay(`力尽きた…\nWAVE ${state.wave} で敗北。`, ()=>{ newGame(); });
+      showOverlay('力尽きた…\nWAVE ' + state.wave + ' で敗北。', function(){ newGame(); });
       return;
     }
 
@@ -390,19 +520,19 @@
     document.getElementById('overlayText').textContent = text;
     ov.classList.remove('hidden');
     const btn = document.getElementById('overlayBtn');
-    btn.onclick = ()=>{ ov.classList.add('hidden'); onNext(); };
+    btn.onclick = function(){ ov.classList.add('hidden'); onNext(); };
   }
 
-  // ---- rendering ----
   function cardEl(card, placed){
     const el = document.createElement('div');
     el.className = 'card ' + card.suit + (placed?' placed':'') + (card.reversed?' reversed':'');
-    el.innerHTML = `
-      <div class="icon">${SUITS[card.suit].icon}</div>
-      <div class="val">${valueLabel(card.value)}</div>
-      <div class="revBadge">⇅</div>
-    `;
-    el.addEventListener('click', ()=>{
+    const iconSvg = isCourt(card.value) ? courtFigureSVG(card.suit) : suitIconSVG(card.suit);
+    el.innerHTML =
+      iconSvg +
+      '<div class="val">' + valueLabel(card.value) + '</div>' +
+      '<div class="sname">' + SUITS[card.suit].name + '</div>' +
+      '<div class="revBadge">⇅</div>';
+    el.addEventListener('click', function(){
       if(placed){
         toggleReverse(card.id);
       } else {
@@ -410,36 +540,34 @@
       }
     });
     if(placed){
-      el.addEventListener('dblclick', ()=> unplaceCard(card.id));
+      el.addEventListener('dblclick', function(){ unplaceCard(card.id); });
       let pressTimer;
-      el.addEventListener('touchstart', ()=>{
-        pressTimer = setTimeout(()=> unplaceCard(card.id), 480);
+      el.addEventListener('touchstart', function(){
+        pressTimer = setTimeout(function(){ unplaceCard(card.id); }, 480);
       }, {passive:true});
-      el.addEventListener('touchend', ()=> clearTimeout(pressTimer));
+      el.addEventListener('touchend', function(){ clearTimeout(pressTimer); });
     }
     return el;
   }
 
   function render(){
-    // hp bars
     const p = state.player, e = state.enemy;
     document.getElementById('playerHpFill').style.width = Math.max(0,100*p.hp/p.maxHp)+'%';
-    document.getElementById('playerHpText').textContent = `${p.hp} / ${p.maxHp}`;
+    document.getElementById('playerHpText').textContent = p.hp + ' / ' + p.maxHp;
     document.getElementById('enemyHpFill').style.width = Math.max(0,100*e.hp/e.maxHp)+'%';
-    document.getElementById('enemyHpText').textContent = `${e.hp} / ${e.maxHp}`;
+    document.getElementById('enemyHpText').textContent = e.hp + ' / ' + e.maxHp;
     document.getElementById('enemyName').textContent = e.name;
-    document.getElementById('enemyWeak').textContent = SUITS[e.weakness].icon;
-    document.getElementById('enemyResist').textContent = SUITS[e.resistance].icon;
+    document.getElementById('enemyArt').innerHTML = ENEMY_ART[e.art];
+    document.getElementById('enemyWeak').innerHTML = suitIconSVG(e.weakness).replace('class="cicon"','class="aicon" style="color:var(--good)"');
+    document.getElementById('enemyResist').innerHTML = suitIconSVG(e.resistance).replace('class="cicon"','class="aicon" style="color:var(--bad)"');
     document.getElementById('waveText').textContent = 'WAVE ' + state.wave;
 
-    // log
     const logEl = document.getElementById('battleLog');
-    logEl.innerHTML = state.log.map((m,i)=>`<div class="${i===0?'new':''}">${m}</div>`).join('');
+    logEl.innerHTML = state.log.map(function(m,i){ return '<div class="' + (i===0?'new':'') + '">' + m + '</div>'; }).join('');
 
-    // spread
     const spreadEl = document.getElementById('spreadArea');
     spreadEl.innerHTML = '';
-    state.spread.forEach((c,i)=>{
+    state.spread.forEach(function(c,i){
       const slot = document.createElement('div');
       slot.className = 'spreadSlot';
       if(c){
@@ -453,7 +581,6 @@
       spreadEl.appendChild(slot);
     });
 
-    // role preview
     const cards = placedCards();
     const result = computeDamage(cards, state.enemy);
     document.getElementById('roleName').textContent = result.role.name;
@@ -461,27 +588,44 @@
     document.getElementById('dmgPreview').textContent = '予測ダメージ: ' + result.total;
     document.getElementById('attackBtn').disabled = cards.length===0;
 
-    // hand
     const handEl = document.getElementById('handArea');
     handEl.innerHTML = '';
-    state.hand.forEach(c=> handEl.appendChild(cardEl(c, false)));
+    state.hand.forEach(function(c){ handEl.appendChild(cardEl(c, false)); });
 
-    // deck / reversed status
     document.getElementById('deckCount').textContent = state.deck.length;
     document.getElementById('revStatus').textContent = reversedUnlocked() ? '解放中(カードをタップで反転)' : '未解放(HP30%以下で解放)';
   }
 
-  // ---- controls ----
+  function buildAttrLegend(){
+    const wrap = document.getElementById('attrLegendHelp');
+    wrap.innerHTML = SUIT_KEYS.map(function(s){
+      return '<span class="ai">' + suitIconSVG(s) + SUITS[s].name + '</span>';
+    }).join('');
+  }
+  function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+  function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+  document.getElementById('helpBtn').addEventListener('click', function(){ openModal('helpModal'); });
+  document.getElementById('closeHelp').addEventListener('click', function(){ closeModal('helpModal'); });
+  document.getElementById('roleListBtn').addEventListener('click', function(){ openModal('roleModal'); });
+  document.getElementById('closeRoleList').addEventListener('click', function(){ closeModal('roleModal'); });
+
   document.getElementById('attackBtn').addEventListener('click', doAttack);
   document.getElementById('clearBtn').addEventListener('click', clearSpread);
-  document.getElementById('debugDamage').addEventListener('click', ()=>{
+  document.getElementById('debugDamage').addEventListener('click', function(){
     state.player.hp = Math.max(1, Math.floor(state.player.maxHp*0.25));
     pushLog('【テスト】HPを25%に設定した。逆位置モード解放。');
     render();
   });
   document.getElementById('debugReset').addEventListener('click', newGame);
 
+  buildAttrLegend();
   newGame();
+
+  if(!localStorage.getItem('tarotProtoSeenHelp')){
+    openModal('helpModal');
+    localStorage.setItem('tarotProtoSeenHelp','1');
+  }
 })();
 </script>
 </body>
